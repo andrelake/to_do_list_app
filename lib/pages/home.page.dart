@@ -15,9 +15,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _toDoController = TextEditingController();
 
-  List _toDoList = [
-    {'title': 'Estudar harmonia', 'done': false}
-  ];
+  List _toDoList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _readData().then((data) {
+      setState(() {
+      _toDoList = json.decode(data);
+      });
+    });
+  }
 
   void _addToList() {
     setState(() {
@@ -29,13 +37,15 @@ class _HomePageState extends State<HomePage> {
       newTask['done'] = false;
 
       _toDoList.add(newTask);
+
+      _saveData();
     });
   }
 
   Future<File> _getFile() async {
     final directory = await getApplicationDocumentsDirectory();
 
-    return File('$directory.path/data.json');
+    return File('${directory.path}/data.json');
   }
 
   Future<File> _saveData() async {
@@ -60,7 +70,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('ToDoList'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blueAccent,
         centerTitle: true,
       ),
       body: Column(
@@ -74,14 +84,14 @@ class _HomePageState extends State<HomePage> {
                     controller: _toDoController,
                     decoration: InputDecoration(
                       labelText: 'New Task',
-                      labelStyle: TextStyle(color: Colors.deepPurple),
+                      labelStyle: TextStyle(color: Colors.blueAccent),
                     ),
                   ),
                 ),
                 ElevatedButton(
                     onPressed: () => _addToList(),
                     child: Text('Add'),
-                    style: ElevatedButton.styleFrom(primary: Colors.deepPurple))
+                    style: ElevatedButton.styleFrom(primary: Colors.blueAccent))
               ],
             ),
           ),
@@ -100,8 +110,8 @@ class _HomePageState extends State<HomePage> {
                   onChanged: (bool? value) {
                     setState(() {
                       _toDoList[index]['done'] = value;
-                      print(_toDoList[index]['done']);
-                    });;
+                      _saveData();
+                    });
                   },
                 );
               },
