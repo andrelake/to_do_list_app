@@ -44,6 +44,22 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<Null> _refresh() async {
+    await Future.delayed(Duration(seconds: 1));
+
+    setState(() {
+      _toDoList.sort((a, b) {
+      if(a['done'] && !b['done']) return 1;
+      else if(!a['done'] && b['done']) return -1;
+      else return 0;
+    });
+
+    _saveData();
+    });
+    
+    return null;
+  }
+
   Future<File> _getFile() async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -98,10 +114,14 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
+            child: RefreshIndicator(
+              child: ListView.builder(
                 padding: EdgeInsets.only(top: 8),
                 itemCount: _toDoList.length,
-                itemBuilder: buildItem),
+                itemBuilder: buildItem,
+              ),
+              onRefresh: _refresh,
+            ),
           ),
         ],
       ),
